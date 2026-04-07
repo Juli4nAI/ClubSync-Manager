@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClubSync - Gestión de Club
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light d-flex">
+
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <div class="sidebar text-white shadow" style="width: 250px;" id="sidebar">
+        <h4 class="pt-0 pb-3 px-4 border-bottom border-secondary mb-0 d-flex align-items-center">
+            <h4 class="p-4 border-bottom border-secondary mb-0 d-flex align-items-center">
+            <img src="img/logo4.png" alt="Logo" style="height: 40px; width: auto;">
+            
+            <span class="fs-3 fw-bold ms-2">ClubSync</span>
+        </h4>
+        <nav class="mt-2">
+            <a href="#" id="nav-socios" class="activo" onclick="mostrarVista('socios', this)">
+                <i class="bi bi-people me-2"></i> Personas y Socios
+            </a>
+            <a href="#" id="nav-actividades" onclick="mostrarVista('actividades', this)">
+                <i class="bi bi-calendar-event me-2"></i> Actividades y Horarios
+            </a>
+            <a href="#" id="nav-instalaciones" onclick="mostrarVista('instalaciones', this)">
+                <i class="bi bi-building me-2"></i> Instalaciones
+            </a>
+        </nav>
+    </div>
+
+    <div class="flex-grow-1 p-3 p-md-5" style="width: 100%; overflow-x: hidden;">
+        
+        <div class="d-md-none mb-4">
+            <button class="btn btn-primary shadow-sm fw-bold" onclick="toggleMenu()">
+                <i class="bi bi-list fs-5 me-1"></i> Menú
+            </button>
+        </div>
+        
+        <div id="socios" class="vista activa">
+            <div class="container mt-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="text-primary fw-bold">
+                        <i class="bi bi-people"></i> Personas y Socios
+                    </h3>
+                    <button class="btn btn-success shadow-sm fw-bold" onclick="abrirModalNuevaPersona()">
+                        <i class="bi bi-person-plus-fill"></i> Registrar Persona
+                    </button>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-3">
+                        <select id="filtro-rol" class="form-select shadow-sm" onchange="cargarPersonas()">
+                            <option value="TODOS">Ver Todos (Roles)</option>
+                            <option value="SOCIOS">Solo Socios</option>
+                            <option value="PERSONAS">Solo Personas (No Socios)</option>
+                            <option value="DEUDORES">Ver Deudores</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <select id="filtro-estado-sistema" class="form-select shadow-sm" onchange="cargarPersonas()">
+                            <option value="AMBOS">Todos (Activos + Inactivos)</option>
+                            <option value="ACTIVO">Solo Activos</option>
+                            <option value="INACTIVO">Solo Inactivos (Bajas)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle mb-0">
+                                <thead class="bg-primary text-white">
+                                    <tr>
+                                        <th class="ps-4">Nombre y Apellido</th>
+                                        <th>DNI</th>
+                                        <th>Contacto</th>
+                                        <th>Estado / Rol</th>
+                                        <th>Deuda</th>
+                                        <th class="text-end pe-4">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-personas">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <div class="spinner-border spinner-border-sm text-primary"></div> Cargando padrón...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="actividades" class="vista">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-primary m-0"><i class="bi bi-calendar-event"></i> Actividades y Eventos</h2>
+                <button class="btn btn-primary shadow-sm" onclick="abrirModalNuevaActividad()">
+                    <i class="bi bi-plus-lg"></i> Nueva Actividad/Evento
+                </button>
+            </div>
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Actividad/Evento</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
+                                    <th>Instalación y Horarios</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-actividades"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="instalaciones" class="vista">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-success m-0"><i class="bi bi-building"></i> Estado de Instalaciones</h2>
+                <button class="btn btn-success shadow-sm" onclick="abrirModalNuevaInstalacion()">
+                    <i class="bi bi-plus-lg"></i> Nueva Instalación
+                </button>
+            </div>
+            <div class="row" id="grid-instalaciones"></div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="modalNuevaInstalacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-success">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Agregar Instalación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-instalacion">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre de la Instalación</label>
+                            <input type="text" class="form-control border-success" id="inst-nombre" placeholder="Ej: Cancha de Tenis 1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Capacidad Máxima (Personas)</label>
+                            <input type="number" class="form-control" id="inst-capacidad" placeholder="Ej: 20" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Descripcion</label>
+                            <textarea class="form-control" id="inst-descripcion" placeholder="Ej: Cancha de tenis con red"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ancho (metros)</label>
+                            <input type="number" class="form-control" id="inst-ancho" placeholder="Ej: 10">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Largo (metros)</label>
+                            <input type="number" class="form-control" id="inst-largo" placeholder="Ej: 20">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="guardarInstalacion()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEditarInstalacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-primary">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Editar Instalación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-editar-instalacion">
+                        <input type="hidden" id="edit-inst-id">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre</label>
+                            <input type="text" class="form-control" id="edit-inst-nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Capacidad</label>
+                            <input type="number" class="form-control" id="edit-inst-capacidad" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Descripción</label>
+                            <textarea class="form-control" id="edit-inst-descripcion" rows="2"></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label fw-bold">Ancho (m)</label>
+                                <input type="number" step="0.1" class="form-control" id="edit-inst-ancho">
+                            </div>
+                            <div class="col">
+                                <label class="form-label fw-bold">Largo (m)</label>
+                                <input type="number" step="0.1" class="form-control" id="edit-inst-largo">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Estado</label>
+                            <select class="form-select" id="edit-inst-estado">
+                                <option value="DISPONIBLE">Disponible</option>
+                                <option value="MANTENIMIENTO">En Mantenimiento</option>
+                                <option value="INACTIVO">Inactivo</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarEdicionInstalacion()">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalNuevaActividad" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-primary border-start border-5">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-calendar-plus"></i> Agregar Actividad</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-actividad">
+                        <div class="mb-3">
+                            <label for="tipoActividad" class="form-label fw-bold">Tipo de Registro</label>
+                            <select class="form-select bg-light border-0" id="tipoActividad" required>
+                                <option value="ACTIVIDAD" selected>Actividad Regular (Solo Socios)</option>
+                                <option value="EVENTO">Evento Especial (Abierto a No Socios)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre de la Actividad</label>
+                            <input type="text" class="form-control" id="act-nombre" placeholder="Ej: Natación Inicial" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Precio Mensual ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="act-monto" placeholder="Ej: 5000.00" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Instalación Asignada</label>
+                            <select class="form-select" id="act-instalacion" required>
+                                <option value="">Seleccione una instalación...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Responsable a Cargo</label>
+                            <select class="form-select" id="act-responsable" required>
+                                <option value="">Seleccione un responsable...</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarNuevaActividad()">Guardar Actividad</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <div class="modal fade" id="modalHorarios" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-info border-start border-5">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-info"><i class="bi bi-clock"></i> Gestión de Horarios</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-white p-4">
+                    
+                    <h6 class="fw-bold text-secondary mb-3">Horarios Actuales:</h6>
+                    <ul class="list-group list-group-flush mb-4" id="listaHorariosContenido">
+                        </ul>
+
+                    <h6 class="fw-bold text-secondary border-top pt-4 mb-3">Agregar Nuevo Horario:</h6>
+                    <div class="row g-2 align-items-end">
+                        <input type="hidden" id="horario-actividad-id"> 
+                        
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted mb-1">Día</label>
+                            <select class="form-select form-select-sm" id="horario-dia">
+                                <option value="1">Lunes</option>
+                                <option value="2">Martes</option>
+                                <option value="3">Miércoles</option>
+                                <option value="4">Jueves</option>
+                                <option value="5">Viernes</option>
+                                <option value="6">Sábado</option>
+                                <option value="0">Domingo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted mb-1">Inicio</label>
+                            <input type="time" class="form-control form-control-sm" id="horario-inicio">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted mb-1">Fin</label>
+                            <input type="time" class="form-control form-control-sm" id="horario-fin">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-sm btn-info w-100 fw-bold text-white" onclick="agregarHorario()">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEditarActividad" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-warning border-start border-5">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-warning"><i class="bi bi-pencil"></i> Editar Actividad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-white p-4">
+                    <form id="formEditarActividad">
+                        <input type="hidden" id="editActividadId"> <div class="mb-4">
+                            <label for="editNombreActividad" class="form-label fw-bold">Nombre de la Actividad</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="editNombreActividad" required placeholder="Ej: Tenis Inicial">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="editPrecioActividad" class="form-label fw-bold">Precio Mensual ($)</label>
+                            <input type="number" class="form-control form-control-lg bg-light border-0" id="editPrecioActividad" required placeholder="Ej: 5000">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="editInstalacionActividad" class="form-label fw-bold">Instalación Asignada</label>
+                            <select class="form-select form-select-lg bg-light border-0" id="editInstalacionActividad" required>
+                                <option value="" disabled selected>Seleccione una instalación</option>
+                                </select>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="button" class="btn btn-warning btn-lg fw-bold p-3 text-dark" onclick="guardarEdicionActividad()">
+                                <i class="bi bi-save me-2"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalParticipantes" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-primary border-start border-5">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-primary">
+                        <i class="bi bi-people-fill"></i> Participantes Inscritos
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-white p-4">
+                    
+                    <div class="bg-light p-3 rounded-3 mb-4 border">
+                        <label class="form-label small fw-bold text-secondary mb-1" id="labelTipoInscripcion">Inscribir participante</label>
+                        <div class="input-group">
+                            <select class="form-select" id="selectNuevoParticipante">
+                                <option value="" selected disabled>Cargando opciones...</option>
+                            </select>
+                            <button class="btn btn-primary" type="button" onclick="inscribirParticipante()">
+                                <i class="bi bi-person-plus-fill"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-secondary mb-0">Listado actual:</h6>
+                        <span class="badge bg-primary rounded-pill fs-6" id="contadorParticipantes">0</span>
+                    </div>
+                    
+                    <ul class="list-group list-group-flush" id="listaParticipantesContenido">
+                        </ul>
+
+                    <input type="hidden" id="participantesActividadId">
+                    <input type="hidden" id="participantesActividadTipo">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalPersona" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-success border-start border-5">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-success" id="tituloModalPersona">
+                        <i class="bi bi-person-plus-fill"></i> Registrar Persona
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-white p-4">
+                    
+                    <form id="formPersona">
+                        <input type="hidden" id="personaId"> 
+                        
+                        <div class="mb-3">
+                            <label for="personaNombre" class="form-label fw-bold">Nombre y Apellido</label>
+                            <input type="text" class="form-control" id="personaNombre" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="personaDni" class="form-label fw-bold">DNI</label>
+                                <input type="text" class="form-control" id="personaDni" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="personaTelefono" class="form-label fw-bold">Teléfono</label>
+                                <input type="text" class="form-control" id="personaTelefono">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="personaMail" class="form-label fw-bold">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="personaMail">
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success fw-bold" onclick="guardarPersona()">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalPago" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-success border-start border-5">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-success"><i class="bi bi-cash-coin"></i> Registrar Cobro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-white p-4">
+                    <p class="mb-2 text-secondary">Abonando cuenta de: <strong class="text-dark" id="pagoNombrePersona"></strong></p>
+                    <p class="mb-4 text-danger fw-bold" style="font-size: 1.1rem;">Deuda actual: $<span id="pagoDeudaActual"></span></p>
+                    
+                    <form id="formPago">
+                        <input type="hidden" id="pagoPersonaId">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Concepto / Motivo</label>
+                            <input type="text" class="form-control" id="pagoConcepto" placeholder="Ej: Cuota Abril" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Monto a abonar ($)</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" class="form-control bg-light border-success" id="pagoMonto" required>
+                                <button class="btn btn-outline-primary fw-bold" type="button" onclick="generarQR()">
+                                    <i class="bi bi-qr-code"></i> Generar QR
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success fw-bold" onclick="procesarPago()">
+                        <i class="bi bi-check-circle"></i> Confirmar Pago
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalHistorialPagos" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-info border-start border-5">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-info"><i class="bi bi-clock-history"></i> Historial de Pagos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-white p-0">
+                    <div class="p-3 bg-light border-bottom">
+                        <h6 class="mb-0 fw-bold text-secondary" id="historialNombrePersona"></h6>
+                    </div>
+                    <ul class="list-group list-group-flush" id="listaHistorialPagos">
+                        </ul>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalVistaQR" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-qr-code-scan"></i> Escaneá para pagar</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center p-5">
+                    <h2 class="text-success fw-bold mb-1" id="qrMontoMostrar"></h2>
+                    <p class="text-muted fs-5 mb-4" id="qrConceptoMostrar"></p>
+                    
+                    <div id="codigoQRGigante" class="d-inline-block p-3 bg-white border rounded shadow"></div>
+                    
+                    <div id="pagoExitosoAnimacion" class="d-none text-center py-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 6rem;"></i>
+                        <h3 class="text-success fw-bold mt-3">¡Pago Acreditado!</h3>
+                        <p class="text-muted">La deuda fue saldada correctamente.</p>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-secondary w-50 fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chatbot-widget" class="position-fixed bottom-0 end-0 p-4" style="z-index: 1050;">
+        
+        <div id="chatbot-window" class="card shadow-lg d-none mb-3" style="width: 450px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden;">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center p-3">
+                <h6 class="m-0 fw-bold"><i class="bi bi-robot me-2"></i> Asistente ClubSync</h6>
+                <button type="button" class="btn-close btn-close-white" onclick="toggleChat()"></button>
+            </div>
+            
+            <div class="card-body bg-light overflow-auto p-3" id="chat-messages" style="height: 320px; scroll-behavior: smooth;">
+                <div class="mb-3 text-start">
+                    <span class="badge bg-white text-dark border p-3 shadow-sm text-wrap text-start" style="font-size: 0.9rem; border-radius: 15px 15px 15px 0px;">
+                        ¡Hola! Soy el asistente virtual de ClubSync. 👋<br>¿Tenés alguna duda? ¡Estoy aqui para ayudarte!
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white border-top-0 p-3">
+                <div class="input-group">
+                    <input type="text" id="chat-input" class="form-control border-end-0 shadow-none" placeholder="Escribe tu duda..." onkeypress="if(event.key === 'Enter') enviarMensajeChat()">
+                    <button class="btn btn-outline-primary border-start-0 shadow-none" onclick="enviarMensajeChat()">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-end">
+            <button class="btn btn-primary rounded-circle shadow-lg d-flex justify-content-center align-items-center" style="width: 60px; height: 60px; float: right;" onclick="toggleChat()">
+                <i class="bi bi-chat-dots-fill fs-3"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>
