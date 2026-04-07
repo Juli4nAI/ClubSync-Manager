@@ -9,7 +9,6 @@ let modalPersonaObj;
 let modalPagoObj;
 let modalHistorialObj;
 let radarDePago;
-const API_BASE_URL = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', function() {
     modalHorariosObj = new bootstrap.Modal(document.getElementById('modalHorarios'));
@@ -1411,7 +1410,7 @@ function cargarBotonesDeHorariosBD() {
 function consultarMorosos() {
     const idCarga = mostrarIndicadorEscribiendo();
 
-    fetch(`${API_BASE_URL}/api/reportes/morosos`)
+    fetch('/api/reportes/morosos')
     .then(res => res.ok ? res.json() : Promise.reject('Error al cargar morosos'))
     .then(morosos => {
         quitarIndicadorEscribiendo(idCarga);
