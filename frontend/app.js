@@ -1,4 +1,7 @@
-
+// =========================================================================
+// 🚀 URL DEL BACKEND (RAILWAY)
+// =========================================================================
+const API_BASE_URL = 'https://clubsync-manager-production.up.railway.app';
 
 
 let actividadesArray = []; 
@@ -38,8 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
-
 function toggleMenu() {
     document.getElementById('sidebar').classList.toggle('mostrar');
     document.getElementById('overlay').classList.toggle('mostrar');
@@ -52,7 +53,6 @@ function mostrarVista(idVista, elementoMenu) {
     document.getElementById(idVista).classList.add('activa');
     elementoMenu.classList.add('activo');
 
-    
     if (window.innerWidth <= 768) {
         document.getElementById('sidebar').classList.remove('mostrar');
         document.getElementById('overlay').classList.remove('mostrar');
@@ -62,8 +62,6 @@ function mostrarVista(idVista, elementoMenu) {
     if (idVista === 'actividades') cargarActividades();
     if (idVista === 'instalaciones') cargarInstalaciones();
 }
-
-
 
 
 function cargarPersonas() {
@@ -76,13 +74,11 @@ function cargarPersonas() {
     const filtroRol = selectRol ? selectRol.value : 'TODOS';
     const filtroEstadoSis = selectEstado ? selectEstado.value : 'AMBOS';
 
-    console.log("EJECUTANDO FILTRO -> Rol:", filtroRol, "| Estado:", filtroEstadoSis);
-
     tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm text-primary"></div> Cargando padrón...</td></tr>';
 
     Promise.all([
-        fetch('/api/personas').then(res => res.ok ? res.json() : []),
-        fetch('/api/socios').then(res => res.ok ? res.json() : [])
+        fetch(`${API_BASE_URL}/api/personas`).then(res => res.ok ? res.json() : []),
+        fetch(`${API_BASE_URL}/api/socios`).then(res => res.ok ? res.json() : [])
     ])
     .then(([listaPersonas, listaSocios]) => {
         tbody.innerHTML = '';
@@ -173,7 +169,6 @@ function cargarPersonas() {
 
                     <button class="btn btn-sm btn-outline-warning me-1 shadow-sm" onclick="abrirModalEditarPersona(${per.id})" title="Editar Datos"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-outline-danger shadow-sm" onclick="borrarPersona(${per.id})" title="Eliminar del Sistema"><i class="bi bi-trash"></i></button>
-
                 `;
             }
 
@@ -225,7 +220,7 @@ function guardarPersona() {
     }
 
     const metodo = id ? 'PUT' : 'POST';
-    const urlDestino = id ? `/api/personas/${id}` : '/api/personas';
+    const urlDestino = id ? `${API_BASE_URL}/api/personas/${id}` : `${API_BASE_URL}/api/personas`;
 
     fetch(urlDestino, {
         method: metodo,
@@ -246,7 +241,7 @@ function guardarPersona() {
 }
 
 function abrirModalEditarPersona(id) {
-    fetch(`/api/personas/${id}`)
+    fetch(`${API_BASE_URL}/api/personas/${id}`)
         .then(res => {
             if (!res.ok) throw new Error("No se pudo cargar la persona");
             return res.json();
@@ -268,7 +263,7 @@ function abrirModalEditarPersona(id) {
 
 async function borrarPersona(idPersona) {
     try {
-        const resCheck = await fetch(`/api/personas/${idPersona}/es-responsable`);
+        const resCheck = await fetch(`${API_BASE_URL}/api/personas/${idPersona}/es-responsable`);
         const esResponsable = await resCheck.json(); 
 
         let mensaje = "¿Estás seguro de que querés dar de baja a esta persona del sistema?";
@@ -277,7 +272,7 @@ async function borrarPersona(idPersona) {
         }
 
         if (confirm(mensaje)) {
-            const respuesta = await fetch(`/api/personas/${idPersona}/baja`, { method: 'PUT' });
+            const respuesta = await fetch(`${API_BASE_URL}/api/personas/${idPersona}/baja`, { method: 'PUT' });
             if (respuesta.ok) {
                 alert("¡Persona dada de baja con éxito!");
                 cargarPersonas(); 
@@ -294,7 +289,7 @@ async function borrarPersona(idPersona) {
 
 function reactivarPersona(idPersona) {
     if (confirm("¿Querés volver a activar a esta persona en el sistema?")) {
-        fetch(`/api/personas/${idPersona}/reactivar`, { method: 'PUT' })
+        fetch(`${API_BASE_URL}/api/personas/${idPersona}/reactivar`, { method: 'PUT' })
         .then(async respuesta => {
             if (respuesta.ok) {
                 alert("¡Persona restaurada con éxito!");
@@ -309,11 +304,9 @@ function reactivarPersona(idPersona) {
 }
 
 
-
-
 function hacerSocio(idPersona) {
     if(!confirm("¿Confirmás que querés registrar a esta persona como Socio activo?")) return;
-    fetch(`/api/socios/promocionar/${idPersona}`, { method: 'POST' })
+    fetch(`${API_BASE_URL}/api/socios/promocionar/${idPersona}`, { method: 'POST' })
     .then(res => {
         if(res.ok) {
             alert("¡Ahora es un Socio oficial!");
@@ -326,7 +319,7 @@ function hacerSocio(idPersona) {
 
 function darDeBajaSocio(idSocio) {
     if (confirm("¿Estás seguro de que querés dar de baja a este socio? Pasará a figurar como EX SOCIO.")) {
-        fetch(`/api/socios/${idSocio}/baja`, { method: 'PUT' })
+        fetch(`${API_BASE_URL}/api/socios/${idSocio}/baja`, { method: 'PUT' })
         .then(async res => {
             if (res.ok) {
                 alert("¡Socio dado de baja con éxito!");
@@ -347,7 +340,7 @@ function reasociarSocio(idSocio, montoDeuda) {
     }
 
     if (confirm("¿Querés volver a dar de alta a esta persona como Socio activo? Su fecha de alta se actualizará a hoy.")) {
-        fetch(`/api/socios/${idSocio}/reasociar`, { method: 'PUT' })
+        fetch(`${API_BASE_URL}/api/socios/${idSocio}/reasociar`, { method: 'PUT' })
         .then(async res => {
             if (res.ok) {
                 alert("¡Persona reasociada con éxito!");
@@ -362,13 +355,11 @@ function reasociarSocio(idSocio, montoDeuda) {
 }
 
 
-
-
 function cargarInstalaciones() {
     const grid = document.getElementById('grid-instalaciones');
     grid.innerHTML = '<p class="text-center w-100">Cargando instalaciones...</p>';
     
-    fetch('/api/instalaciones')
+    fetch(`${API_BASE_URL}/api/instalaciones`)
         .then(res => res.json())
         .then(datos => {
             grid.innerHTML = '';
@@ -444,7 +435,7 @@ function guardarInstalacion() {
 
     const nuevaInstalacion = { nombre, capacidad, descripcion, ancho, largo, estado };
 
-    fetch('/api/instalaciones', {
+    fetch(`${API_BASE_URL}/api/instalaciones`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevaInstalacion)
@@ -463,7 +454,7 @@ function guardarInstalacion() {
 
 function eliminarInstalacion(id) {
     if (confirm("¿Estás seguro de que querés eliminar esta instalación?")) {
-        fetch(`/api/instalaciones/${id}`, { method: 'DELETE' })
+        fetch(`${API_BASE_URL}/api/instalaciones/${id}`, { method: 'DELETE' })
         .then(respuesta => {
             if (respuesta.ok) cargarInstalaciones();
             else alert("Hubo un error al intentar eliminar. Tiene actividades asociadas");
@@ -496,7 +487,7 @@ function guardarEdicionInstalacion() {
         estado: document.getElementById('edit-inst-estado') ? document.getElementById('edit-inst-estado').value : 'DISPONIBLE'
     };
 
-    fetch(`/api/instalaciones/${id}`, {
+    fetch(`${API_BASE_URL}/api/instalaciones/${id}`, {
         method: 'PUT', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(instalacionEditada)
@@ -514,13 +505,11 @@ function guardarEdicionInstalacion() {
 }
 
 
-
-
 function cargarOpcionesInstalaciones(selectId, instalacionSeleccionadaId = null) {
     const select = document.getElementById(selectId);
     select.innerHTML = '<option value="">Cargando instalaciones...</option>';
 
-    fetch('/api/instalaciones')
+    fetch(`${API_BASE_URL}/api/instalaciones`)
         .then(res => res.json())
         .then(datos => {
             select.innerHTML = '<option value="">Seleccione una instalación...</option>';
@@ -537,7 +526,7 @@ function cargarOpcionesInstalaciones(selectId, instalacionSeleccionadaId = null)
 }
 
 function cargarInstalacionesParaEdicion() {
-    fetch('/api/instalaciones')
+    fetch(`${API_BASE_URL}/api/instalaciones`)
         .then(response => response.json())
         .then(instalaciones => {
             const select = document.getElementById('editInstalacionActividad');
@@ -555,7 +544,7 @@ function cargarOpcionesResponsables(selectId, responsableSeleccionadoId = null) 
     const select = document.getElementById(selectId);
     select.innerHTML = '<option value="">Cargando responsables...</option>';
 
-    fetch('/api/socios')
+    fetch(`${API_BASE_URL}/api/socios`)
         .then(res => res.json())
         .then(datos => {
             select.innerHTML = '<option value="">Seleccione un responsable...</option>';
@@ -575,8 +564,8 @@ function cargarActividades() {
     tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted"><div class="spinner-border spinner-border-sm text-primary"></div> Cargando...</td></tr>';
     
     Promise.all([
-        fetch('/api/actividades').then(res => res.ok ? res.json() : []),
-        fetch('/api/eventos').then(res => res.ok ? res.json() : [])
+        fetch(`${API_BASE_URL}/api/actividades`).then(res => res.ok ? res.json() : []),
+        fetch(`${API_BASE_URL}/api/eventos`).then(res => res.ok ? res.json() : [])
     ])
     .then(([listaActividades, listaEventos]) => {
         const actividadesMarcadas = listaActividades.map(act => ({ ...act, tipoRegistro: 'ACTIVIDAD' }));
@@ -690,7 +679,7 @@ function abrirModalNuevaActividad() {
 
 function guardarNuevaActividad() {
     const tipoSeleccionado = document.getElementById('tipoActividad').value;
-    const urlDestino = tipoSeleccionado === 'EVENTO' ? '/api/eventos' : '/api/actividades';
+    const urlDestino = tipoSeleccionado === 'EVENTO' ? `${API_BASE_URL}/api/eventos` : `${API_BASE_URL}/api/actividades`;
 
     const datosNuevos = {   
         tipoSeleccionado: document.getElementById('tipoActividad').value, 
@@ -721,7 +710,7 @@ function guardarNuevaActividad() {
 function eliminarActividad(id, tipo) {
     const nombreTipo = tipo === 'EVENTO' ? 'evento' : 'actividad';
     if (confirm(`¿Estás seguro de que querés eliminar este ${nombreTipo}?`)) {
-        const urlDestino = tipo === 'EVENTO' ? `/api/eventos/${id}` : `/api/actividades/${id}`;
+        const urlDestino = tipo === 'EVENTO' ? `${API_BASE_URL}/api/eventos/${id}` : `${API_BASE_URL}/api/actividades/${id}`;
 
         fetch(urlDestino, { method: 'DELETE' })
         .then(async respuesta => {
@@ -740,7 +729,7 @@ function eliminarActividad(id, tipo) {
 function reactivarActividad(id, tipo) {
     const nombreTipo = tipo === 'EVENTO' ? 'evento' : 'actividad';
     if (confirm(`¿Querés volver a activar este ${nombreTipo}?`)) {
-        const urlDestino = tipo === 'EVENTO' ? `/api/eventos/${id}/reactivar` : `/api/actividades/${id}/reactivar`;
+        const urlDestino = tipo === 'EVENTO' ? `${API_BASE_URL}/api/eventos/${id}/reactivar` : `${API_BASE_URL}/api/actividades/${id}/reactivar`;
 
         fetch(urlDestino, { method: 'PATCH' }) 
         .then(async respuesta => {
@@ -790,7 +779,7 @@ function guardarEdicionActividad() {
 
     if (responsableId) datosActualizados.responsable = { id: parseInt(responsableId) };
 
-    const urlDestino = tipo === 'EVENTO' ? `/api/eventos/${id}` : `/api/actividades/${id}`;
+    const urlDestino = tipo === 'EVENTO' ? `${API_BASE_URL}/api/eventos/${id}` : `${API_BASE_URL}/api/actividades/${id}`;
 
     fetch(urlDestino, {
         method: 'PUT', 
@@ -812,15 +801,13 @@ function guardarEdicionActividad() {
 }
 
 
-
-
 function abrirModalHorarios(idActividad) {
     document.getElementById('horario-actividad-id').value = idActividad;
     const contenedorLista = document.getElementById('listaHorariosContenido');
     contenedorLista.innerHTML = '<li class="list-group-item text-center text-muted">Cargando...</li>';
     modalHorariosObj.show();
 
-    fetch(`/api/actividades/${idActividad}/horarios`)
+    fetch(`${API_BASE_URL}/api/actividades/${idActividad}/horarios`)
         .then(response => {
             if (!response.ok) throw new Error('Error al cargar horarios');
             return response.json();
@@ -883,7 +870,7 @@ function agregarHorario() {
         return;
     }
 
-    fetch(`/api/actividades/${actividadId}/horarios`, {
+    fetch(`${API_BASE_URL}/api/actividades/${actividadId}/horarios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoHorario)
@@ -907,7 +894,7 @@ function agregarHorario() {
 
 function eliminarHorario(actividadId, horarioId) {
     if (confirm("¿Estás seguro de que querés quitar este horario?")) {
-        fetch(`/api/actividades/${actividadId}/horarios/${horarioId}`, { method: 'DELETE' })
+        fetch(`${API_BASE_URL}/api/actividades/${actividadId}/horarios/${horarioId}`, { method: 'DELETE' })
         .then(respuesta => {
             if (respuesta.ok) {
                 abrirModalHorarios(actividadId);
@@ -919,8 +906,6 @@ function eliminarHorario(actividadId, horarioId) {
         .catch(error => console.error('Error:', error));
     }
 }
-
-
 
 
 function abrirModalParticipantes(id, tipo) {
@@ -938,8 +923,8 @@ function abrirModalParticipantes(id, tipo) {
     
     modalParticipantesObj.show();
 
-    const urlRegistro = tipo === 'EVENTO' ? `/api/eventos/${id}` : `/api/actividades/${id}`;
-    const urlCandidatos = tipo === 'EVENTO' ? '/api/personas' : '/api/socios'; 
+    const urlRegistro = tipo === 'EVENTO' ? `${API_BASE_URL}/api/eventos/${id}` : `${API_BASE_URL}/api/actividades/${id}`;
+    const urlCandidatos = tipo === 'EVENTO' ? `${API_BASE_URL}/api/personas` : `${API_BASE_URL}/api/socios`; 
 
     Promise.all([
         fetch(urlRegistro).then(r => r.ok ? r.json() : Promise.reject('Error en registro')),
@@ -1016,8 +1001,8 @@ function inscribirParticipante() {
     }
 
     let urlDestino = tipo === 'EVENTO' 
-        ? `/api/eventos/${idActividadEvento}/inscripcion-persona/${idCandidatoElegido}`
-        : `/api/actividades/${idActividadEvento}/inscripcion-socio/${idCandidatoElegido}`;
+        ? `${API_BASE_URL}/api/eventos/${idActividadEvento}/inscripcion-persona/${idCandidatoElegido}`
+        : `${API_BASE_URL}/api/actividades/${idActividadEvento}/inscripcion-socio/${idCandidatoElegido}`;
 
     fetch(urlDestino, { method: 'POST' })
     .then(async respuesta => {
@@ -1034,8 +1019,8 @@ function quitarParticipante(idRegistro, tipo, idParticipante) {
     if (!confirm('¿Estás seguro de que querés desvincular a esta persona?')) return;
 
     let urlDestino = tipo === 'EVENTO' 
-        ? `/api/eventos/${idRegistro}/quitar-persona/${idParticipante}`
-        : `/api/actividades/${idRegistro}/quitar-socio/${idParticipante}`;
+        ? `${API_BASE_URL}/api/eventos/${idRegistro}/quitar-persona/${idParticipante}`
+        : `${API_BASE_URL}/api/actividades/${idRegistro}/quitar-socio/${idParticipante}`;
 
     fetch(urlDestino, { method: 'DELETE' })
     .then(async respuesta => {
@@ -1047,8 +1032,6 @@ function quitarParticipante(idRegistro, tipo, idParticipante) {
     })
     .catch(error => console.error('Error de red:', error));
 }
-
-
 
 
 function abrirModalPago(id, nombre, deuda) {
@@ -1074,7 +1057,7 @@ function procesarPago() {
         alert("Por favor, ingresá un concepto para el pago (Ej: Cuota Abril)."); return;
     }
 
-    fetch(`/api/personas/${id}/pagar?monto=${monto}&concepto=${encodeURIComponent(concepto)}`, {
+    fetch(`${API_BASE_URL}/api/personas/${id}/pagar?monto=${monto}&concepto=${encodeURIComponent(concepto)}`, {
         method: 'POST'
     })
     .then(async respuesta => {
@@ -1098,7 +1081,7 @@ function verHistorialPagos(idPersona, nombre) {
     
     modalHistorialObj.show();
 
-    fetch(`/api/personas/${idPersona}/pagos`)
+    fetch(`${API_BASE_URL}/api/personas/${idPersona}/pagos`)
         .then(res => res.json())
         .then(pagos => {
             lista.innerHTML = '';
@@ -1124,7 +1107,7 @@ function verHistorialPagos(idPersona, nombre) {
                             <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2" style="font-size: 1rem;">
                                 + $${pago.monto.toFixed(2)}
                             </span>
-                            <a href="/api/pagos/${pago.id}/comprobante" class="btn btn-outline-danger btn-sm" target="_blank" title="Descargar Comprobante PDF">
+                            <a href="${API_BASE_URL}/api/pagos/${pago.id}/comprobante" class="btn btn-outline-danger btn-sm" target="_blank" title="Descargar Comprobante PDF">
                                 <i class="bi bi-file-earmark-pdf-fill"></i> PDF
                             </a>
                         </div>
@@ -1152,7 +1135,7 @@ function generarQR() {
     btnQr.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Creando...';
     btnQr.disabled = true;
 
-    fetch(`/api/personas/${id}/generar-qr?monto=${monto}&concepto=${encodeURIComponent(concepto)}`, {
+    fetch(`${API_BASE_URL}/api/personas/${id}/generar-qr?monto=${monto}&concepto=${encodeURIComponent(concepto)}`, {
         method: 'POST'
     })
     .then(async res => {
@@ -1194,7 +1177,7 @@ function generarQR() {
 
         if (radarDePago) clearInterval(radarDePago);
 
-        fetch(`/api/personas/${id}?t=${new Date().getTime()}`)
+        fetch(`${API_BASE_URL}/api/personas/${id}?t=${new Date().getTime()}`)
             .then(res => res.json())
             .then(socioInicial => {
                 
@@ -1206,7 +1189,7 @@ function generarQR() {
                 console.log(`🎯 Deuda original: $${deudaInicial} | Esperamos que baje a: $${deudaEsperada}`);
 
                 radarDePago = setInterval(() => {
-                    fetch(`/api/personas/${id}?t=${new Date().getTime()}`)
+                    fetch(`${API_BASE_URL}/api/personas/${id}?t=${new Date().getTime()}`)
                         .then(respuesta => respuesta.json())
                         .then(socioActual => {
                             
@@ -1231,10 +1214,6 @@ function generarQR() {
             .catch(error => console.error("❌ Error al obtener la deuda inicial:", error));
     });
 }
-
-
-
-
 
 
 let cacheActividades = [];
@@ -1274,7 +1253,6 @@ function mostrarBienvenidaConBotones() {
     
     chatMessages.appendChild(msgDiv);
 
-    
     setTimeout(() => {
         chatMessages.scrollTo({
             top: chatMessages.scrollHeight,
@@ -1309,21 +1287,15 @@ function procesarAccionBoton(accion, botonDOM) {
     }
 }
 
-
-
-
-
 function consultarActividadesBD() {
     const idCarga = mostrarIndicadorEscribiendo();
 
-    
     Promise.all([
-        fetch('/api/actividades').then(res => res.ok ? res.json() : []),
-        fetch('/api/eventos').then(res => res.ok ? res.json() : [])
+        fetch(`${API_BASE_URL}/api/actividades`).then(res => res.ok ? res.json() : []),
+        fetch(`${API_BASE_URL}/api/eventos`).then(res => res.ok ? res.json() : [])
     ])
     .then(([actividades, eventos]) => {
         quitarIndicadorEscribiendo(idCarga);
-        
         
         const data = [...actividades, ...eventos];
 
@@ -1333,7 +1305,6 @@ function consultarActividadesBD() {
         }
 
         let textoRespuesta = "**Esto es lo que tenemos en el club:**\n\n";
-        
         
         if (actividades.length > 0) {
             textoRespuesta += "**Actividades Regulares:**\n";
@@ -1363,19 +1334,15 @@ function consultarActividadesBD() {
     });
 }
 
-
-
-
 function cargarBotonesDeHorariosBD() {
     const idCarga = mostrarIndicadorEscribiendo();
 
     Promise.all([
-        fetch('/api/actividades').then(res => res.ok ? res.json() : []),
-        fetch('/api/eventos').then(res => res.ok ? res.json() : [])
+        fetch(`${API_BASE_URL}/api/actividades`).then(res => res.ok ? res.json() : []),
+        fetch(`${API_BASE_URL}/api/eventos`).then(res => res.ok ? res.json() : [])
     ])
     .then(([actividades, eventos]) => {
         quitarIndicadorEscribiendo(idCarga);
-        
         
         cacheActividades = [...actividades, ...eventos]; 
 
@@ -1390,9 +1357,7 @@ function cargarBotonesDeHorariosBD() {
         const btnDiv = document.createElement("div");
         btnDiv.className = "d-flex flex-wrap gap-2 ms-2 mb-3 mt-1 w-75";
 
-        
         cacheActividades.forEach(item => {
-            
             let colorBoton = item.fecha ? 'btn-outline-success' : 'btn-outline-primary';
             btnDiv.innerHTML += `<button class="btn btn-sm ${colorBoton} rounded-pill fw-semibold" onclick="responderHorarioDinamico(${item.id}, this, '${item.nombre}')">${item.nombre}</button>`;
         });
@@ -1410,7 +1375,7 @@ function cargarBotonesDeHorariosBD() {
 function consultarMorosos() {
     const idCarga = mostrarIndicadorEscribiendo();
 
-    fetch('/api/reportes/morosos')
+    fetch(`${API_BASE_URL}/api/reportes/morosos`)
     .then(res => res.ok ? res.json() : Promise.reject('Error al cargar morosos'))
     .then(morosos => {
         quitarIndicadorEscribiendo(idCarga);
@@ -1425,7 +1390,6 @@ function consultarMorosos() {
         const msgDiv = document.createElement('div');
         msgDiv.className = 'mb-3 text-start';
 
-        
         let htmlTarjetas = `
             <div class="badge bg-white text-dark border p-3 shadow-sm text-wrap text-start" style="font-size: 0.9rem; border-radius: 15px 15px 15px 0px; width: 85%;">
                 <div class="mb-2 border-bottom pb-2">
@@ -1433,9 +1397,7 @@ function consultarMorosos() {
                 </div>
         `;
 
-        
         morosos.forEach(socio => {
-            
             let nombre = socio.nombreCompleto || socio.apynom || "Sin nombre"; 
             let monto = socio.deudaTotal || socio.monto || 0;
             let dni = socio.dni || socio.documento || 'S/D';
@@ -1470,7 +1432,7 @@ function consultarMorosos() {
 
 function consultarEstadoInstalaciones() {
     const idCarga = mostrarIndicadorEscribiendo();
-    fetch('/api/instalaciones/estado')
+    fetch(`${API_BASE_URL}/api/instalaciones/estado`)
     .then(res => res.ok ? res.json() : Promise.reject('Error al cargar estado de instalaciones'))
     .then(estado => {
         quitarIndicadorEscribiendo(idCarga);
@@ -1494,9 +1456,6 @@ function consultarEstadoInstalaciones() {
     });
 }
 
-
-
-
 function responderHorarioDinamico(idBuscado, botonDOM, nombreAct) {
     botonDOM.parentElement.remove();
     agregarMensajeUI(`Horarios de ${nombreAct}`, 'usuario');
@@ -1506,22 +1465,18 @@ function responderHorarioDinamico(idBuscado, botonDOM, nombreAct) {
     setTimeout(() => {
         quitarIndicadorEscribiendo(idCarga);
 
-        
         const actividad = cacheActividades.find(a => a.id === idBuscado);
         let respuesta = "";
 
-        
         if (actividad.horarios && actividad.horarios.length > 0) {
             respuesta = `Los horarios registrados para **${actividad.nombre}** son:\n`;
             actividad.horarios.forEach(h => {
-                
                 let inicio = h.horaInicio ? h.horaInicio.substring(0, 5) : "";
                 let fin = h.horaFin ? h.horaFin.substring(0, 5) : "";
                 respuesta += `- **${h.diaSemana}** de ${inicio} a ${fin} hs.\n`;
             });
             
         } else if (actividad.fecha) {
-            
             respuesta = `El evento **${actividad.nombre}** está programado para el día **${actividad.fecha}**.\nDuración estimada: ${actividad.duracion || 'a definir'} hs.`;
             
         } else {
@@ -1537,42 +1492,34 @@ function responderHorarioDinamico(idBuscado, botonDOM, nombreAct) {
 function consultarEstadisticasClub() {
     const idCarga = mostrarIndicadorEscribiendo();
 
-    
     const hoy = new Date();
     const primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().split('T')[0];
     const ultimoDia = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).toISOString().split('T')[0];
 
-    
     Promise.all([
-        fetch('/api/reportes/estado-socios').then(res => res.ok ? res.json() : {}),
-        fetch(`/api/reportes/balance?inicio=${primerDia}&fin=${ultimoDia}`).then(res => res.ok ? res.json() : {}),
-        fetch('/api/reportes/actividades-inscriptos').then(res => res.ok ? res.json() : {}),
-        fetch('/api/reportes/ocupacion-instalaciones').then(res => res.ok ? res.json() : {}),
-        fetch('/api/reportes/recaudacion-por-tipo').then(res => res.ok ? res.json() : {})
+        fetch(`${API_BASE_URL}/api/reportes/estado-socios`).then(res => res.ok ? res.json() : {}),
+        fetch(`${API_BASE_URL}/api/reportes/balance?inicio=${primerDia}&fin=${ultimoDia}`).then(res => res.ok ? res.json() : {}),
+        fetch(`${API_BASE_URL}/api/reportes/actividades-inscriptos`).then(res => res.ok ? res.json() : {}),
+        fetch(`${API_BASE_URL}/api/reportes/ocupacion-instalaciones`).then(res => res.ok ? res.json() : {}),
+        fetch(`${API_BASE_URL}/api/reportes/recaudacion-por-tipo`).then(res => res.ok ? res.json() : {})
     ])
     .then(([socios, balance, actividades, instalaciones, recaudacion]) => {
         quitarIndicadorEscribiendo(idCarga);
 
-        
-
-        
         let totalSocios = 0, activos = 0;
         for (const [estado, cant] of Object.entries(socios)) {
             if (estado.toUpperCase().includes('ACTIVO') && !estado.toUpperCase().includes('IN')) activos = cant;
             totalSocios += cant;
         }
 
-        
         let topActividad = Object.entries(actividades).sort((a, b) => b[1] - a[1])[0] || ['Ninguna', 0];
         let topInstalacion = Object.entries(instalaciones).sort((a, b) => b[1] - a[1])[0] || ['Ninguna', 0];
 
-        
         const formatiarDinero = (num) => num ? '$' + num.toLocaleString('es-AR') : '$0';
         let ingresos = formatiarDinero(balance.totalIngresos);
         let gastos = formatiarDinero(balance.totalGastos);
         let saldo = formatiarDinero(balance.saldoFinal);
 
-        
         const chatMessages = document.getElementById('chat-messages');
         const msgDiv = document.createElement('div');
         msgDiv.className = 'mb-3 text-start';
@@ -1659,10 +1606,6 @@ function consultarEstadisticasClub() {
     });
 }
 
-
-
-
-
 function enviarMensaje() {
     const inputElement = document.getElementById("chat-input");
     const textoUsuario = inputElement.value.trim();
@@ -1680,9 +1623,6 @@ function enviarMensaje() {
         ofrecerSiguientePaso();
     }, 1000); 
 }
-
-
-
 
 function agregarMensajeUI(texto, emisor) {
     const chatMessages = document.getElementById('chat-messages');
@@ -1720,13 +1660,9 @@ function quitarIndicadorEscribiendo(id) {
     if (loadingDiv) loadingDiv.remove();
 }
 
-
-
-
 function ofrecerSiguientePaso() {
     const chatMessages = document.getElementById("chat-messages");
     const div = document.createElement("div");
-    
     
     div.className = "d-flex gap-2 justify-content-start mt-2 mb-4 ms-2";
     div.id = "flujo-cierre";
@@ -1742,7 +1678,6 @@ function ofrecerSiguientePaso() {
     
     chatMessages.appendChild(div);
 
-    
     chatMessages.scrollTo({
         top: chatMessages.scrollHeight,
         behavior: 'smooth'
@@ -1750,13 +1685,9 @@ function ofrecerSiguientePaso() {
 }
 
 function reiniciarFlujo(boton) {
-    
     boton.parentElement.remove();
-    
-    
     mostrarBienvenidaConBotones();
 
-    
     const chatMessages = document.getElementById("chat-messages");
     setTimeout(() => {
         chatMessages.scrollTo({
@@ -1767,18 +1698,13 @@ function reiniciarFlujo(boton) {
 }
 
 function cerrarConGracias(boton) {
-    
     boton.parentElement.remove();
-    
-    
     agregarMensajeUI("¡De nada! Fue un gusto ayudarte. Si necesitás algo más, solo escribime. ¡Que disfrutes del club! 😊", 'bot');
 
-    
     setTimeout(() => {
         mostrarBienvenidaConBotones();
     }, 2500);
 }
-
 
 cargarPersonas();
 mostrarBienvenidaConBotones();
