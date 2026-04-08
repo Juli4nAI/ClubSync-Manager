@@ -10,7 +10,7 @@
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
 ## 🌐 Demo Online
-🚀 **[Visitar ClubSync en Producción](https://club-sync-manager.vercel.app/)**
+🚀 **[Visitar ClubSync](https://club-sync-manager.vercel.app/)**
 
 ## 🎓 El Origen del Proyecto: De la Facultad al Mundo Real
 
