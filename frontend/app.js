@@ -1,7 +1,7 @@
 // =========================================================================
 // 🚀 URL DEL BACKEND (RAILWAY)
 // =========================================================================
-const API_BASE_URL = 'https://clubsync-manager.onrender.com/';
+const API_BASE_URL = 'https://clubsync-manager.onrender.com';
 
 
 let actividadesArray = []; 
