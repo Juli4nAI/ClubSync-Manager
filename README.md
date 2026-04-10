@@ -25,7 +25,7 @@ Para dar este salto de calidad, refactoricé y migré toda la lógica de negocio
 * **Del entorno local a la Web:** El backend fue reescrito completamente en **Java** utilizando el framework **Spring Boot**, exponiendo la lógica a través de una API REST.
 * **Persistencia Relacional:** Se reemplazó el manejo de objetos en memoria por una base de datos relacional (MySQL) gestionada mediante **Spring Data JPA / Hibernate**.
 * **Interfaz y Experiencia de Usuario (UX/UI):** Se desarrolló un frontend interactivo desde cero utilizando **JavaScript**, **Fetch API** para el asincronismo y **Bootstrap 5** para un diseño responsivo, emulando la experiencia de los sistemas ERP modernos.
-* **Nuevas Features:** Aprovechando el nuevo stack, escalé el sistema integrando herramientas del mundo real, como una pasarela de pagos (Mercado Pago), generación automática de comprobantes en PDF (iText) y un Asistente Virtual híbrido.
+* **Nuevas Implementaciones:** Aprovechando el nuevo stack, escalé el sistema integrando herramientas del mundo real, como una pasarela de pagos (Mercado Pago), generación automática de comprobantes en PDF (iText) y un Asistente Virtual híbrido.
 
 Este proyecto representa mi transición desde la asimilación de conceptos teóricos profundos hacia la construcción de software con estándares y arquitecturas empresariales.
 
@@ -40,7 +40,7 @@ ClubSync es una plataforma web integral diseñada para la administración de clu
 * **🏟️ Control de Instalaciones:** ABM de espacios físicos (canchas, piletas, salones) con control de capacidad, dimensiones y estado de mantenimiento.
 * **📅 Actividades y Eventos:** Programación de actividades recurrentes y eventos especiales. Asignación de profesores/responsables, control de cupos y grilla de horarios.
 * **💳 Cobranzas y Mercado Pago:** Sistema de facturación integrado. Generación automática de códigos QR para pagos mediante Mercado Pago, con un polling en tiempo real que verifica la acreditación del pago y actualiza la UI sin recargar la página.
-* **🤖 Asistente Virtual Inteligente (IA Integrada):** Inicialmente fue hecho consumiendo la API de una Inteligencia Artificial y diseñado con arquitectura **RAG** y **Function Calling**. El asistente evolucionó hacia una **arquitectura híbrida** donde se incorporó un **Modelo Determinístico**. Gracias a este cambio, se logró reducir la dependencia de APIs de terceros, garantizando la precisión en las respuestas del ChatBot al reducir las alucinaciones a 0, manteniendo la opción de lenguaje natural disponible.
+* **🤖 Asistente Virtual Inteligente (IA Integrada):** Inicialmente fue hecho consumiendo la API de una Inteligencia Artificial y diseñado con arquitectura **RAG** y **Function Calling**. El asistente evolucionó hacia una **arquitectura híbrida** donde se incorporó un **Modelo Determinístico**. Gracias a este cambio, se logró reducir la dependencia de APIs de terceros, garantizando la precisión en las respuestas del ChatBot al reducir las alucinaciones a 0, manteniendo la opción de usar el LLM Groq disponible.
 * **📊 Web Responsiva:** Interfaz moderna, totalmente adaptable a dispositivos móviles, garantizando una buena experiencia de usuario (UX).
 
 
@@ -68,8 +68,8 @@ El sistema fue diseñado para operar en la nube utilizando prácticas de DevOps:
 * **Containerización (Docker):** El backend de Spring Boot está encapsulado mediante un `Dockerfile`, lo que garantiza que la aplicación corra de manera idéntica en cualquier entorno, manejando sus propias dependencias y versión de Java.
 * **Arquitectura Desacoplada en Producción:**
   * **Frontend (Vercel):** La carpeta `/frontend` se despliega automáticamente en Vercel, aprovechando su CDN global para una carga instantánea de los recursos estáticos.
-  * **Backend & Base de Datos (Railway):** El contenedor Docker de Spring Boot y la instancia productiva de MySQL operan dentro de la red privada de Railway. El entorno está protegido mediante el uso estricto de variables de entorno (`ENVIRONMENT VARIABLES`) para credenciales, tokens de Mercado Pago y configuraciones de base de datos.
-* **Integración y Despliegue Continuo (CI/CD):** Ambos servicios (Vercel y Railway) están enlazados directamente a la rama `main` de este repositorio de GitHub. Cualquier `push` o integración de código activa un *pipeline* automatizado que compila y despliega la nueva versión sin tiempo de inactividad.
+  * **Backend & Base de Datos:** El contenedor Docker de Spring Boot y la instancia productiva de MySQL operan dentro de la red privada de Render. El entorno está protegido mediante el uso estricto de variables de entorno (`ENVIRONMENT VARIABLES`) para credenciales, tokens de Mercado Pago y configuraciones de base de datos.
+* **Integración y Despliegue Continuo (CI/CD):** Ambos servicios (Vercel y Render) están enlazados directamente a la rama `main` de este repositorio de GitHub. Cualquier `push` o integración de código activa un *pipeline* automatizado que compila y despliega la nueva versión sin tiempo de inactividad.
 
 ---
 
